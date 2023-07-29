@@ -10,7 +10,7 @@ extern crate dotenv;
 use dotenv::dotenv;
 
 pub struct MongoRepo {
-    col: Collection<User>,
+    pub col: Collection<User>,
 }
 
 impl MongoRepo {
@@ -24,22 +24,5 @@ impl MongoRepo {
         let db = client.database("rust_api");
         let col: Collection<User> = db.collection("user");
         MongoRepo { col }
-    }
-
-    pub fn create_user(&self, new_user: User) -> Result<InsertOneResult, Error> {
-        let new_doc = User {
-            email: new_user.email.to_owned(),
-            id: None,
-            name: new_user.name.to_owned(),
-            password: new_user.password.to_owned(),
-        };
-
-        let user = self
-            .col
-            .insert_one(new_doc, None)
-            .ok()
-            .expect("Error create user");
-
-        Ok(user)
     }
 }

@@ -5,8 +5,7 @@ mod api;
 mod models;
 mod repository;
 
-use api::user_api::create_user;
-use repository::mongodb_repo::MongoRepo;
+use api::user_api::{create_user, get_user, update_user};
 
 #[get("/")]
 fn hello() -> &'static str {
@@ -15,9 +14,5 @@ fn hello() -> &'static str {
 
 #[launch]
 fn rocket() -> _ {
-    let db = MongoRepo::init();
-
-    rocket::build()
-        .manage(db)
-        .mount("/", routes![hello, create_user])
+    rocket::build().mount("/", routes![hello, create_user, get_user, update_user])
 }

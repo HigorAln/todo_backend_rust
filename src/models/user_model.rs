@@ -8,5 +8,5 @@ pub struct User {
     pub name: String,
 
     pub email: String,
-    pub password: String,
+    pub password: Option<String>,
 }
