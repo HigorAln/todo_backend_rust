@@ -112,6 +112,31 @@ impl UserRepo {
             }),
         }
     }
+
+    pub fn login_user(&self, email: &String, password: &String) -> Result<User, ResponseError> {
+        dbg!(password, email);
+        let filter = doc! {"email": email, "password": password};
+        let user = self.col.find_one(filter, None);
+
+        match user {
+            Ok(user) => match user {
+                Some(user) => Ok(User {
+                    email: user.email,
+                    name: user.name,
+                    id: None,
+                    password: None,
+                }),
+                None => Err(ResponseError {
+                    message: "Error, email or password is incorrect",
+                    status: Some(Status::BadRequest),
+                }),
+            },
+            Err(_) => Err(ResponseError {
+                message: "Error, email or password is incorrect",
+                status: Some(Status::BadRequest),
+            }),
+        }
+    }
 }
 
 fn verify_object_id(id: &String) -> Result<ObjectId, ResponseError> {
