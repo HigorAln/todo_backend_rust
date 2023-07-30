@@ -5,7 +5,7 @@ mod api;
 mod models;
 mod repository;
 
-use api::user_api::{create_user, get_user, update_user};
+use api::user_api::{create_user, delete_user, get_user, update_user};
 
 #[get("/")]
 fn hello() -> &'static str {
@@ -14,5 +14,8 @@ fn hello() -> &'static str {
 
 #[launch]
 fn rocket() -> _ {
-    rocket::build().mount("/", routes![hello, create_user, get_user, update_user])
+    rocket::build().mount("/", routes![hello]).mount(
+        "/user",
+        routes![create_user, get_user, update_user, delete_user],
+    )
 }

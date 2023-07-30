@@ -1,11 +1,14 @@
 use mongodb::{bson::oid::ObjectId, results::InsertOneResult};
-use rocket::{http::Status, serde::json::Json};
+use rocket::{http::Status, response::status::Custom, serde::json::Json};
+use todo_backend::ResponseError;
 
 use crate::{models::user_model::User, repository::user_repo::UserRepo};
 
-#[post("/user", data = "<new_user>")]
-pub fn create_user(new_user: Json<User>) -> Result<Json<InsertOneResult>, Status> {
-    let data = User {
+#[post("/", data = "<new_user>")]
+pub fn create_user(
+    new_user: Json<User>,
+) -> Result<Json<InsertOneResult>, Custom<Json<ResponseError>>> {
+    let data: User = User {
         id: None,
         name: new_user.name.to_owned(),
         email: new_user.email.to_owned(),
@@ -17,14 +20,20 @@ pub fn create_user(new_user: Json<User>) -> Result<Json<InsertOneResult>, Status
 
     match user {
         Ok(user) => Ok(Json(user)),
-        Err(_) => Err(Status::InternalServerError),
+        Err(err) => Err(Custom(err.status.unwrap(), Json(err))),
     }
 }
 
-#[get("/user/<id>")]
-pub fn get_user(id: String) -> Result<Json<User>, Status> {
+#[get("/<id>")]
+pub fn get_user(id: String) -> Result<Json<User>, Custom<Json<ResponseError>>> {
     if id.is_empty() {
-        return Err(Status::BadRequest);
+        return Err(Custom(
+            Status::BadRequest,
+            Json(ResponseError {
+                message: "Bad Request",
+                status: None,
+            }),
+        ));
     }
 
     let collection = UserRepo::init();
@@ -32,18 +41,30 @@ pub fn get_user(id: String) -> Result<Json<User>, Status> {
 
     match find_user {
         Ok(user) => Ok(Json(user)),
-        Err(_) => Err(Status::InternalServerError),
+        Err(err) => Err(Custom(err.status.unwrap(), Json(err))),
     }
 }
 
-#[put("/user/<id>", data = "<new_user>")]
-pub fn update_user(id: String, new_user: Json<User>) -> Result<Json<User>, Status> {
-    if id.is_empty() {
-        return Err(Status::BadRequest);
+#[put("/<id>", data = "<new_user>")]
+pub fn update_user(
+    id: String,
+    new_user: Json<User>,
+) -> Result<Json<User>, Custom<Json<ResponseError>>> {
+    let obj_id = match ObjectId::parse_str(&id) {
+        Ok(obj) => obj,
+        Err(_) => {
+            return Err(Custom(
+                Status::BadRequest,
+                Json(ResponseError {
+                    message: "This ID is not valid",
+                    status: None,
+                }),
+            ))
+        }
     };
 
     let data = User {
-        id: Some(ObjectId::parse_str(&id).unwrap()),
+        id: Some(obj_id),
         name: new_user.name.to_owned(),
         email: new_user.email.to_owned(),
         password: new_user.password.to_owned(),
@@ -52,7 +73,6 @@ pub fn update_user(id: String, new_user: Json<User>) -> Result<Json<User>, Statu
     let collection = UserRepo::init();
     let update_result = collection.update_user(&id, data);
 
-    dbg!(&update_result);
     match update_result {
         Ok(update) => {
             if update.matched_count == 1 {
@@ -60,12 +80,41 @@ pub fn update_user(id: String, new_user: Json<User>) -> Result<Json<User>, Statu
 
                 return match update_user_info {
                     Ok(user) => Ok(Json(user)),
-                    Err(_) => Err(Status::InternalServerError),
+                    Err(_) => Err(Custom(
+                        Status::InternalServerError,
+                        Json(ResponseError {
+                            message: "Error, not is possible update this user",
+                            status: None,
+                        }),
+                    )),
                 };
             } else {
-                return Err(Status::NotFound);
+                return Err(Custom(
+                    Status::NotFound,
+                    Json(ResponseError {
+                        message: "User not found",
+                        status: None,
+                    }),
+                ));
             }
         }
+        Err(_) => Err(Custom(
+            Status::InternalServerError,
+            Json(ResponseError {
+                message: "Error, not is possible update this user",
+                status: None,
+            }),
+        )),
+    }
+}
+
+#[delete("/<id>")]
+pub fn delete_user(id: String) -> Result<Status, Status> {
+    let collection = UserRepo::init();
+    let delete_result = collection.delete_user(&id);
+
+    match delete_result {
+        Ok(_) => Ok(Status::Ok),
         Err(_) => Err(Status::InternalServerError),
     }
 }

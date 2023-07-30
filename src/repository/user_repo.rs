@@ -1,10 +1,11 @@
 use crate::models::user_model::User;
 use mongodb::{
     bson::{doc, oid::ObjectId},
-    error::Error,
-    results::{InsertOneResult, UpdateResult},
+    results::{DeleteResult, InsertOneResult, UpdateResult},
     sync::{Client, Collection},
 };
+use rocket::http::Status;
+use todo_backend::ResponseError;
 
 use std::env;
 extern crate dotenv;
@@ -24,41 +25,56 @@ impl UserRepo {
         let client = Client::with_uri_str(uri).unwrap();
         let db = client.database("rust_api");
         let col: Collection<User> = db.collection("user");
+
         UserRepo { col }
     }
 
-    pub fn create_user(&self, new_user: User) -> Result<InsertOneResult, Error> {
-        let new_doc = User {
-            email: new_user.email.to_owned(),
-            id: None,
-            name: new_user.name.to_owned(),
-            password: new_user.password.to_owned(),
+    pub fn create_user(&self, new_user: User) -> Result<InsertOneResult, ResponseError> {
+        let user = self.col.insert_one(new_user, None);
+
+        match user {
+            Ok(user) => Ok(user),
+            Err(_) => Err(ResponseError {
+                message: "Error, not is possible create this user",
+                status: Some(Status::InternalServerError),
+            }),
+        }
+    }
+
+    pub fn get_user(&self, id: String) -> Result<User, ResponseError> {
+        let obj_id: ObjectId = match verify_object_id(&id) {
+            Ok(obj) => obj,
+            Err(err) => return Err(err),
         };
 
-        let user = self
-            .col
-            .insert_one(new_doc, None)
-            .ok()
-            .expect("Error create user");
-
-        Ok(user)
-    }
-
-    pub fn get_user(&self, id: String) -> Result<User, Error> {
-        let obj_id = ObjectId::parse_str(id).unwrap();
+        let not_fount_error = ResponseError {
+            message: "user not found",
+            status: Some(Status::NotFound),
+        };
 
         let filter = doc! {"_id": obj_id};
-        let user = self
-            .col
-            .find_one(filter, None)
-            .ok()
-            .expect("Failed to execute find_one.");
+        let user = self.col.find_one(filter, None);
 
-        Ok(user.unwrap())
+        let result = match user {
+            Ok(user) => match user {
+                Some(user) => Ok(user),
+                None => return Err(not_fount_error),
+            },
+            Err(_) => Err(not_fount_error),
+        };
+
+        match result {
+            Ok(user) => Ok(user),
+            Err(err) => Err(err),
+        }
     }
 
-    pub fn update_user(&self, id: &String, new_user: User) -> Result<UpdateResult, Error> {
-        let obj_id = ObjectId::parse_str(id).unwrap();
+    pub fn update_user(&self, id: &String, new_user: User) -> Result<UpdateResult, ResponseError> {
+        let obj_id: ObjectId = match verify_object_id(&id) {
+            Ok(obj) => obj,
+            Err(err) => return Err(err),
+        };
+
         let filter = doc! { "_id": obj_id};
         let new_doc = doc! {
             "$set": {
@@ -68,12 +84,44 @@ impl UserRepo {
                 "password": new_user.password,
             }
         };
-        let update_doc = self
-            .col
-            .update_one(filter, new_doc, None)
-            .ok()
-            .expect("Error, not is possible update this user");
+        let update_doc = self.col.update_one(filter, new_doc, None);
 
-        Ok(update_doc)
+        match update_doc {
+            Ok(update_doc) => Ok(update_doc),
+            Err(_) => Err(ResponseError {
+                message: "Error, not is possible update this user",
+                status: Some(Status::InternalServerError),
+            }),
+        }
+    }
+
+    pub fn delete_user(&self, id: &String) -> Result<DeleteResult, ResponseError> {
+        let obj_id: ObjectId = match verify_object_id(&id) {
+            Ok(obj) => obj,
+            Err(err) => return Err(err),
+        };
+
+        let filter = doc! {"_id": obj_id};
+        let user_detail = self.col.delete_one(filter, None);
+
+        match user_detail {
+            Ok(user_detail) => Ok(user_detail),
+            Err(_) => Err(ResponseError {
+                message: "Error, not is possible delete this user",
+                status: Some(Status::InternalServerError),
+            }),
+        }
+    }
+}
+
+fn verify_object_id(id: &String) -> Result<ObjectId, ResponseError> {
+    match ObjectId::parse_str(id) {
+        Ok(obj) => return Ok(obj),
+        Err(_) => {
+            return Err(ResponseError {
+                message: "This ID is not valid",
+                status: Some(Status::BadRequest),
+            })
+        }
     }
 }
