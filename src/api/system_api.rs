@@ -1,12 +1,9 @@
 use rocket::{response::status::Custom, serde::json::Json};
 use todo_backend::ResponseError;
 
-use crate::{
-    models::user_model::User,
-    repository::{
-        system_repo::{Login, SystemRepo},
-        user_repo::UserRepo,
-    },
+use crate::repository::{
+    system_repo::{Login, SystemRepo},
+    user_repo::{LoginResponse, UserRepo},
 };
 
 #[get("/")]
@@ -21,7 +18,7 @@ pub fn health_check() -> Result<Json<String>, Custom<Json<ResponseError>>> {
 }
 
 #[post("/login", data = "<login>")]
-pub fn login(login: Json<Login>) -> Result<Json<User>, Custom<Json<ResponseError>>> {
+pub fn login(login: Json<Login>) -> Result<Json<LoginResponse>, Custom<Json<ResponseError>>> {
     let collection = UserRepo::init();
     let user = collection.login_user(&login.email, &login.password);
 
