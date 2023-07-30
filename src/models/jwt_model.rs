@@ -1,12 +1,6 @@
 use dotenv::dotenv;
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
-use rocket::{
-    data::Outcome,
-    http::Status,
-    request::FromRequest,
-    serde::{Deserialize, Serialize},
-    Request,
-};
+use rocket::serde::{Deserialize, Serialize};
 use std::{env, error::Error, time};
 
 #[derive(Debug, Serialize, Deserialize)]

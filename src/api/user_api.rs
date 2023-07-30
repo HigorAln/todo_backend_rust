@@ -2,7 +2,10 @@ use mongodb::{bson::oid::ObjectId, results::InsertOneResult};
 use rocket::{http::Status, response::status::Custom, serde::json::Json};
 use todo_backend::ResponseError;
 
-use crate::{models::user_model::User, repository::user_repo::UserRepo};
+use crate::{
+    models::{admin_model::AdminOnly, user_model::User},
+    repository::user_repo::UserRepo,
+};
 
 #[post("/", data = "<new_user>")]
 pub fn create_user(
@@ -25,7 +28,8 @@ pub fn create_user(
 }
 
 #[get("/<id>")]
-pub fn get_user(id: String) -> Result<Json<User>, Custom<Json<ResponseError>>> {
+pub fn get_user(id: String, admin: AdminOnly) -> Result<Json<User>, Custom<Json<ResponseError>>> {
+    dbg!(&admin);
     if id.is_empty() {
         return Err(Custom(
             Status::BadRequest,
