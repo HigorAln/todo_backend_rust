@@ -1,6 +1,6 @@
 use rocket::http::Status;
 
-use crate::{middleware::admin::AdminOnly, repository::user_repo::UserRepo};
+use crate::{middleware::admin::AdminOnly, repository::user::user_repo::UserRepo};
 
 #[delete("/<id>")]
 pub fn delete_user(id: String, _admin: AdminOnly) -> Result<Status, Status> {

@@ -5,36 +5,15 @@ use todo_backend::ResponseError;
 use crate::{
     middleware::user::UserOnly,
     models::user_model::{Role, User},
-    repository::user_repo::UserRepo,
+    repository::user::{update_user::UpdateUserParams, user_repo::UserRepo},
 };
 
 #[put("/<id>", data = "<new_user>")]
 pub fn update_user(
     id: String,
-    new_user: Json<User>,
+    new_user: Json<UpdateUserParams>,
     user_id: UserOnly,
 ) -> Result<Json<User>, Custom<Json<ResponseError>>> {
-    let obj_id = match ObjectId::parse_str(&id) {
-        Ok(obj) => obj,
-        Err(_) => {
-            return Err(Custom(
-                Status::BadRequest,
-                Json(ResponseError {
-                    message: "This ID is not valid",
-                    status: None,
-                }),
-            ))
-        }
-    };
-
-    let data = User {
-        id: Some(obj_id),
-        name: new_user.name.to_owned(),
-        email: new_user.email.to_owned(),
-        password: new_user.password.to_owned(),
-        role: None,
-    };
-
     let collection = UserRepo::init();
 
     match verify_if_can_see(&user_id.id, &id) {
@@ -42,7 +21,7 @@ pub fn update_user(
         Err(e) => return Err(Custom(e.status.unwrap(), Json(e))),
     }
 
-    let update_result = collection.update_user(&id, data);
+    let update_result = collection.update_user(&id, new_user.into_inner());
 
     match update_result {
         Ok(update) => {

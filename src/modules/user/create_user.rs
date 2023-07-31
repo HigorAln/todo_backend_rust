@@ -4,7 +4,7 @@ use todo_backend::ResponseError;
 
 use crate::{
     models::user_model::{Role, User},
-    repository::user_repo::UserRepo,
+    repository::user::user_repo::UserRepo,
 };
 
 #[post("/", data = "<new_user>")]

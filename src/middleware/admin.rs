@@ -5,7 +5,7 @@ use rocket::{
 
 use crate::{
     models::user_model::{Role, User},
-    repository::user_repo::UserRepo,
+    repository::user::user_repo::UserRepo,
     shared::jwt::Jwt,
 };
 

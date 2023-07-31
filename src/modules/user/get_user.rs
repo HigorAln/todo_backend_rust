@@ -2,7 +2,7 @@ use rocket::{response::status::Custom, serde::json::Json};
 use todo_backend::ResponseError;
 
 use crate::{
-    middleware::admin::AdminOnly, models::user_model::User, repository::user_repo::UserRepo,
+    middleware::admin::AdminOnly, models::user_model::User, repository::user::user_repo::UserRepo,
 };
 
 #[get("/<id>")]

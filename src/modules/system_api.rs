@@ -3,7 +3,7 @@ use todo_backend::ResponseError;
 
 use crate::repository::{
     system_repo::{Login, SystemRepo},
-    user_repo::{LoginResponse, UserRepo},
+    user::{login::LoginResponse, user_repo::UserRepo},
 };
 
 #[get("/")]
