@@ -51,7 +51,7 @@ impl<'r> FromRequest<'r> for AdminOnly {
                     email: user.email,
                     name: user.name,
                     id: user.id,
-                    password: None,
+                    password: "".to_string(),
                     role: Some(Role::Admin),
                 },
             }),

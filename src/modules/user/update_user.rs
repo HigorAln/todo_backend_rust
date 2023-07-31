@@ -3,14 +3,16 @@ use rocket::{http::Status, response::status::Custom, serde::json::Json};
 use todo_backend::ResponseError;
 
 use crate::{
-    middleware::user::UserOnly, models::user_model::User, repository::user_repo::UserRepo,
+    middleware::user::UserOnly,
+    models::user_model::{Role, User},
+    repository::user_repo::UserRepo,
 };
 
 #[put("/<id>", data = "<new_user>")]
 pub fn update_user(
     id: String,
     new_user: Json<User>,
-    _user: UserOnly,
+    user_id: UserOnly,
 ) -> Result<Json<User>, Custom<Json<ResponseError>>> {
     let obj_id = match ObjectId::parse_str(&id) {
         Ok(obj) => obj,
@@ -34,6 +36,12 @@ pub fn update_user(
     };
 
     let collection = UserRepo::init();
+
+    match verify_if_can_see(&user_id.id, &id) {
+        Ok(_) => (),
+        Err(e) => return Err(Custom(e.status.unwrap(), Json(e))),
+    }
+
     let update_result = collection.update_user(&id, data);
 
     match update_result {
@@ -68,5 +76,34 @@ pub fn update_user(
                 status: None,
             }),
         )),
+    }
+}
+
+fn verify_if_can_see(user_logged_id: &String, id: &String) -> Result<(), ResponseError> {
+    let collection = UserRepo::init();
+
+    match user_logged_id == id {
+        true => Ok(()),
+        false => {
+            let user_logged = collection.get_user(user_logged_id.clone());
+
+            match user_logged {
+                Ok(value) => match value.role.unwrap() {
+                    Role::Admin => return Ok(()),
+                    _ => {
+                        return Err(ResponseError {
+                            message: "Error, you not have permission to do this",
+                            status: Some(Status::Unauthorized),
+                        })
+                    }
+                },
+                Err(_) => {
+                    return Err(ResponseError {
+                        message: "Error, you not have permission to do this",
+                        status: Some(Status::Unauthorized),
+                    })
+                }
+            }
+        }
     }
 }

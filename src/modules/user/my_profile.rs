@@ -15,7 +15,7 @@ pub fn get_my_profile(user: UserOnly) -> Result<Json<User>, Custom<Json<Response
             email: user.email,
             name: user.name,
             id: None,
-            password: None,
+            password: "".to_string(),
             role: user.role,
         })),
         Err(err) => Err(Custom(err.status.unwrap(), Json(err))),

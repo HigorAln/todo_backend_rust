@@ -85,8 +85,13 @@ impl UserRepo {
 
         let mut update_fields = doc! {};
 
-        update_fields.insert("name", new_user.name);
-        update_fields.insert("email", new_user.email);
+        if let Some(name) = new_user.name {
+            update_fields.insert("name", name);
+        }
+
+        if let Some(email) = new_user.email {
+            update_fields.insert("email", email);
+        }
 
         if let Some(password) = new_user.password {
             update_fields.insert("password", password);
