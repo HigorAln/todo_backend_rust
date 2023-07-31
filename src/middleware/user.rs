@@ -1,7 +1,5 @@
+use crate::shared::jwt::Jwt;
 use rocket::request::{FromRequest, Outcome, Request};
-
-use crate::models::jwt_model::Jwt;
-
 pub struct UserOnly {
     pub id: String,
 }

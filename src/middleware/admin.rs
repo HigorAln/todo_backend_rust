@@ -4,11 +4,9 @@ use rocket::{
 };
 
 use crate::{
-    models::{
-        jwt_model::Jwt,
-        user_model::{Role, User},
-    },
+    models::user_model::{Role, User},
     repository::user_repo::UserRepo,
+    shared::jwt::Jwt,
 };
 
 #[derive(Debug)]

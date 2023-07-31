@@ -1,4 +1,4 @@
-use crate::models::{jwt_model::Jwt, user_model::User};
+use crate::{models::user_model::User, shared::jwt::Jwt};
 use mongodb::{
     bson::{doc, oid::ObjectId},
     results::{DeleteResult, InsertOneResult, UpdateResult},
@@ -70,13 +70,7 @@ impl UserRepo {
         };
 
         match result {
-            Ok(user) => Ok(User {
-                email: user.email,
-                name: user.name,
-                id: user.id,
-                password: None,
-                role: user.role,
-            }),
+            Ok(user) => Ok(user),
             Err(err) => Err(err),
         }
     }
@@ -157,13 +151,7 @@ impl UserRepo {
                     };
 
                     Ok(LoginResponse {
-                        user: User {
-                            email: user.email,
-                            name: user.name,
-                            id: None,
-                            password: None,
-                            role: user.role,
-                        },
+                        user,
                         token: token_result,
                     })
                 }

@@ -5,5 +5,9 @@
     "jsonwebtoken",
     "mongodb",
     "MONGOURI"
+  ],
+  "rust-analyzer.linkedProjects": [
+    "./Cargo.toml",
+    "./Cargo.toml"
   ]
 }

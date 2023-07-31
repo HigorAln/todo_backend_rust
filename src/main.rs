@@ -1,14 +1,18 @@
 #[macro_use]
 extern crate rocket;
 
-mod api;
 mod middleware;
 mod models;
+mod modules;
 mod repository;
+mod shared;
 
-use api::{
+use modules::{
     system_api::{health_check, login},
-    user_api::{create_user, delete_user, get_my_profile, get_user, update_user},
+    user::{
+        create_user::create_user, delete_user::delete_user, get_user::get_user,
+        my_profile::get_my_profile, update_user::update_user,
+    },
 };
 
 #[launch]
