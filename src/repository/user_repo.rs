@@ -70,7 +70,13 @@ impl UserRepo {
         };
 
         match result {
-            Ok(user) => Ok(user),
+            Ok(user) => Ok(User {
+                email: user.email,
+                name: user.name,
+                id: user.id,
+                password: None,
+                role: user.role,
+            }),
             Err(err) => Err(err),
         }
     }
@@ -82,14 +88,20 @@ impl UserRepo {
         };
 
         let filter = doc! { "_id": obj_id};
+
+        let mut update_fields = doc! {};
+
+        update_fields.insert("name", new_user.name);
+        update_fields.insert("email", new_user.email);
+
+        if let Some(password) = new_user.password {
+            update_fields.insert("password", password);
+        }
+
         let new_doc = doc! {
-            "$set": {
-                "id": new_user.id,
-                "name": new_user.name,
-                "email": new_user.email,
-                "password": new_user.password,
-            }
+            "$set": update_fields
         };
+
         let update_doc = self.col.update_one(filter, new_doc, None);
 
         match update_doc {
@@ -150,6 +162,7 @@ impl UserRepo {
                             name: user.name,
                             id: None,
                             password: None,
+                            role: user.role,
                         },
                         token: token_result,
                     })

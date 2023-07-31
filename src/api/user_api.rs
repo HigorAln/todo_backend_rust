@@ -3,7 +3,8 @@ use rocket::{http::Status, response::status::Custom, serde::json::Json};
 use todo_backend::ResponseError;
 
 use crate::{
-    models::{admin_model::AdminOnly, user_model::User},
+    middleware::{admin::AdminOnly, user::UserOnly},
+    models::user_model::{Role, User},
     repository::user_repo::UserRepo,
 };
 
@@ -16,6 +17,7 @@ pub fn create_user(
         name: new_user.name.to_owned(),
         email: new_user.email.to_owned(),
         password: new_user.password.to_owned(),
+        role: Some(Role::User),
     };
 
     let collection = UserRepo::init();
@@ -28,18 +30,7 @@ pub fn create_user(
 }
 
 #[get("/<id>")]
-pub fn get_user(id: String, admin: AdminOnly) -> Result<Json<User>, Custom<Json<ResponseError>>> {
-    dbg!(&admin);
-    if id.is_empty() {
-        return Err(Custom(
-            Status::BadRequest,
-            Json(ResponseError {
-                message: "Bad Request",
-                status: None,
-            }),
-        ));
-    }
-
+pub fn get_user(id: String, _admin: AdminOnly) -> Result<Json<User>, Custom<Json<ResponseError>>> {
     let collection = UserRepo::init();
     let find_user = collection.get_user(id);
 
@@ -53,6 +44,7 @@ pub fn get_user(id: String, admin: AdminOnly) -> Result<Json<User>, Custom<Json<
 pub fn update_user(
     id: String,
     new_user: Json<User>,
+    _user: UserOnly,
 ) -> Result<Json<User>, Custom<Json<ResponseError>>> {
     let obj_id = match ObjectId::parse_str(&id) {
         Ok(obj) => obj,
@@ -72,6 +64,7 @@ pub fn update_user(
         name: new_user.name.to_owned(),
         email: new_user.email.to_owned(),
         password: new_user.password.to_owned(),
+        role: None,
     };
 
     let collection = UserRepo::init();
@@ -113,12 +106,29 @@ pub fn update_user(
 }
 
 #[delete("/<id>")]
-pub fn delete_user(id: String) -> Result<Status, Status> {
+pub fn delete_user(id: String, _admin: AdminOnly) -> Result<Status, Status> {
     let collection = UserRepo::init();
     let delete_result = collection.delete_user(&id);
 
     match delete_result {
         Ok(_) => Ok(Status::Ok),
         Err(_) => Err(Status::InternalServerError),
+    }
+}
+
+#[get("/my-profile")]
+pub fn get_my_profile(user: UserOnly) -> Result<Json<User>, Custom<Json<ResponseError>>> {
+    let collection = UserRepo::init();
+    let find_user = collection.get_user(user.id);
+
+    match find_user {
+        Ok(user) => Ok(Json(User {
+            email: user.email,
+            name: user.name,
+            id: None,
+            password: None,
+            role: user.role,
+        })),
+        Err(err) => Err(Custom(err.status.unwrap(), Json(err))),
     }
 }
