@@ -17,9 +17,31 @@ pub struct CreateTodoRepo {
 
 impl TodoRepo {
     pub fn create_todo(&self, data: CreateTodoRepo) -> Result<InsertOneResult, ResponseError> {
-        Err(ResponseError {
-            status: Some(rocket::http::Status::InternalServerError),
-            message: "we can't create a todo",
-        })
+        let todo = Todo {
+            category: match data.category {
+                Some(v) => Some(ObjectId::parse_str(&v).unwrap()),
+                None => None,
+            },
+            description: data.description,
+            done: false,
+            id: None,
+            owner: match data.owner {
+                Some(v) => Some(ObjectId::parse_str(&v).unwrap()),
+                None => None,
+            },
+            priority: data.priority,
+            title: data.title,
+            todos: None,
+        };
+
+        let todo_result = self.col.insert_one(todo, None);
+
+        match todo_result {
+            Ok(value) => Ok(value),
+            Err(_) => Err(ResponseError {
+                status: Some(rocket::http::Status::InternalServerError),
+                message: "we can't create a todo",
+            }),
+        }
     }
 }

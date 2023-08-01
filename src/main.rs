@@ -9,6 +9,7 @@ mod shared;
 
 use modules::{
     system_api::{health_check, login},
+    todo::create_todo::create_todo,
     user::{
         create_user::create_user, delete_user::delete_user, get_user::get_user,
         my_profile::get_my_profile, update_user::update_user,
@@ -29,4 +30,5 @@ fn rocket() -> _ {
                 get_my_profile
             ],
         )
+        .mount("/todo", routes![create_todo])
 }

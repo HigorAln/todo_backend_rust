@@ -1,4 +1,3 @@
-use mongodb::bson::oid::ObjectId;
 use rocket::{http::Status, response::status::Custom, serde::json::Json};
 use todo_backend::ResponseError;
 
