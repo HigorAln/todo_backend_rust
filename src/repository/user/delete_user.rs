@@ -5,7 +5,9 @@ use mongodb::{
 use rocket::http::Status;
 use todo_backend::ResponseError;
 
-use super::user_repo::{verify_object_id, UserRepo};
+use crate::shared::validate_id::verify_object_id;
+
+use super::user_repo::UserRepo;
 
 impl UserRepo {
     pub fn delete_user(&self, id: &String) -> Result<DeleteResult, ResponseError> {

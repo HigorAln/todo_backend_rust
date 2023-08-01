@@ -17,7 +17,7 @@ impl TodoRepo {
         };
         let client = Client::with_uri_str(uri).unwrap();
         let db = client.database("rust_api");
-        let col: Collection<Todo> = db.collection("user");
+        let col: Collection<Todo> = db.collection("todo");
 
         TodoRepo { col }
     }

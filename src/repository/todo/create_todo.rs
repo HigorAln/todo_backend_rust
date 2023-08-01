@@ -10,28 +10,20 @@ use super::todo_repo::TodoRepo;
 pub struct CreateTodoRepo {
     title: String,
     description: Option<String>,
-    owner: Option<String>,
-    category: Option<String>,
+    category: String,
     priority: Option<u8>,
 }
 
 impl TodoRepo {
     pub fn create_todo(&self, data: CreateTodoRepo) -> Result<InsertOneResult, ResponseError> {
         let todo = Todo {
-            category: match data.category {
-                Some(v) => Some(ObjectId::parse_str(&v).unwrap()),
-                None => None,
-            },
+            category: ObjectId::parse_str(&data.category).unwrap(),
             description: data.description,
             done: false,
             id: None,
-            owner: match data.owner {
-                Some(v) => Some(ObjectId::parse_str(&v).unwrap()),
-                None => None,
-            },
+
             priority: data.priority,
             title: data.title,
-            todos: None,
         };
 
         let todo_result = self.col.insert_one(todo, None);

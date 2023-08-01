@@ -11,11 +11,5 @@ pub struct Todo {
     pub done: bool,
     pub priority: Option<u8>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub owner: Option<ObjectId>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub category: Option<ObjectId>,
-
-    pub todos: Option<Vec<ObjectId>>,
+    pub category: ObjectId,
 }

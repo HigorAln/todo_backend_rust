@@ -2,9 +2,9 @@ use mongodb::bson::{doc, oid::ObjectId};
 use rocket::http::Status;
 use todo_backend::ResponseError;
 
-use crate::models::user_model::User;
+use crate::{models::user_model::User, shared::validate_id::verify_object_id};
 
-use super::user_repo::{verify_object_id, UserRepo};
+use super::user_repo::UserRepo;
 
 impl UserRepo {
     pub fn get_user(&self, id: String) -> Result<User, ResponseError> {

@@ -1,10 +1,5 @@
 use crate::models::user_model::User;
-use mongodb::{
-    bson::oid::ObjectId,
-    sync::{Client, Collection},
-};
-use rocket::http::Status;
-use todo_backend::ResponseError;
+use mongodb::sync::{Client, Collection};
 
 use dotenv::dotenv;
 use std::env;
@@ -25,17 +20,5 @@ impl UserRepo {
         let col: Collection<User> = db.collection("user");
 
         UserRepo { col }
-    }
-}
-
-pub fn verify_object_id(id: &String) -> Result<ObjectId, ResponseError> {
-    match ObjectId::parse_str(id) {
-        Ok(obj) => return Ok(obj),
-        Err(_) => {
-            return Err(ResponseError {
-                message: "This ID is not valid",
-                status: Some(Status::BadRequest),
-            })
-        }
     }
 }
