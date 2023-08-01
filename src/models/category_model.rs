@@ -1,21 +1,17 @@
 use mongodb::bson::oid::ObjectId;
+
 use rocket::serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct Todo {
+pub struct Category {
     #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
-    pub id: Option<ObjectId>,
+    id: Option<ObjectId>,
 
-    pub title: String,
-    pub description: Option<String>,
-    pub done: bool,
-    pub priority: Option<u8>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub owner: Option<ObjectId>,
+    pub name: String,
+    pub created_at: Option<String>,
+    pub updated_at: Option<String>,
+    pub owner: ObjectId,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub category: Option<ObjectId>,
-
     pub todos: Option<Vec<ObjectId>>,
 }

@@ -5,8 +5,6 @@ use rocket::{
 };
 use todo_backend::ResponseError;
 
-use crate::repository::todo_repo::TodoRepo;
-
 #[derive(Debug, Serialize, Deserialize)]
 struct RequestBody {
     title: String,
