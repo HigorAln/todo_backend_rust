@@ -1,12 +1,9 @@
 use rocket::{response::status::Custom, serde::json::Json};
 use todo_backend::ResponseError;
 
-use crate::{
-    middleware::admin::AdminOnly, models::user_model::User, repository::user::user_repo::UserRepo,
-};
+use crate::{models::user_model::User, repository::user::user_repo::UserRepo};
 
-#[get("/<id>")]
-pub fn get_user(id: String, _admin: AdminOnly) -> Result<Json<User>, Custom<Json<ResponseError>>> {
+pub fn get_user(id: String) -> Result<Json<User>, Custom<Json<ResponseError>>> {
     let collection = UserRepo::init();
     let find_user = collection.get_user(id);
 

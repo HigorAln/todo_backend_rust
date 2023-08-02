@@ -1,32 +1,13 @@
-use mongodb::{bson::oid::ObjectId, results::InsertOneResult};
-use rocket::serde::{Deserialize, Serialize};
+use mongodb::results::InsertOneResult;
 use todo_backend::ResponseError;
 
 use crate::models::todo_model::Todo;
 
 use super::todo_repo::TodoRepo;
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct CreateTodoRepo {
-    title: String,
-    description: Option<String>,
-    category: String,
-    priority: Option<u8>,
-}
-
 impl TodoRepo {
-    pub fn create_todo(&self, data: CreateTodoRepo) -> Result<InsertOneResult, ResponseError> {
-        let todo = Todo {
-            category: ObjectId::parse_str(&data.category).unwrap(),
-            description: data.description,
-            done: false,
-            id: None,
-
-            priority: data.priority,
-            title: data.title,
-        };
-
-        let todo_result = self.col.insert_one(todo, None);
+    pub fn create_todo(&self, data: Todo) -> Result<InsertOneResult, ResponseError> {
+        let todo_result = self.col.insert_one(data, None);
 
         match todo_result {
             Ok(value) => Ok(value),

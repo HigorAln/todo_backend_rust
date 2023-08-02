@@ -7,7 +7,6 @@ use crate::{
     repository::user::user_repo::UserRepo,
 };
 
-#[post("/", data = "<new_user>")]
 pub fn create_user(
     new_user: Json<User>,
 ) -> Result<Json<InsertOneResult>, Custom<Json<ResponseError>>> {

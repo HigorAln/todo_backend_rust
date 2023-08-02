@@ -5,7 +5,6 @@ use crate::{
     middleware::user::UserOnly, models::user_model::User, repository::user::user_repo::UserRepo,
 };
 
-#[get("/my-profile")]
 pub fn get_my_profile(user: UserOnly) -> Result<Json<User>, Custom<Json<ResponseError>>> {
     let collection = UserRepo::init();
     let find_user = collection.get_user(user.id);

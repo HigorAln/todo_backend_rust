@@ -1,6 +1,5 @@
 use dotenv::dotenv;
 use rocket::http::Status;
-use rocket::serde::{Deserialize, Serialize};
 use std::env;
 use todo_backend::ResponseError;
 
@@ -11,19 +10,9 @@ use mongodb::{
 
 use crate::models::user_model::User;
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct Login {
-    pub email: String,
-    pub password: String,
-}
-
-pub struct SystemRepo {}
+use super::system_repo::SystemRepo;
 
 impl SystemRepo {
-    pub fn init() -> SystemRepo {
-        SystemRepo {}
-    }
-
     pub fn health_check(&self) -> Result<String, ResponseError> {
         dotenv().ok();
         let uri = match env::var("MONGOURI") {

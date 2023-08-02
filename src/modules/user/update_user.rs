@@ -7,19 +7,17 @@ use crate::{
     repository::user::{update_user::UpdateUserParams, user_repo::UserRepo},
 };
 
-#[put("/<id>", data = "<new_user>")]
 pub fn update_user(
     id: String,
     new_user: Json<UpdateUserParams>,
     user_id: UserOnly,
 ) -> Result<Json<User>, Custom<Json<ResponseError>>> {
-    let collection = UserRepo::init();
-
     match verify_if_can_see(&user_id.id, &id) {
         Ok(_) => (),
         Err(e) => return Err(Custom(e.status.unwrap(), Json(e))),
     }
 
+    let collection = UserRepo::init();
     let update_result = collection.update_user(&id, new_user.into_inner());
 
     match update_result {

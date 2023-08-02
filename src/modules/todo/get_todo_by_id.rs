@@ -14,7 +14,6 @@ pub struct GetTodoByIdResponse {
     category: String,
 }
 
-#[get("/<id>")]
 pub fn get_todo_by_id(
     id: String,
 ) -> Result<Json<GetTodoByIdResponse>, Custom<Json<ResponseError>>> {

@@ -12,7 +12,6 @@ pub struct ResponseTodoByCategory {
     _id: Option<String>,
 }
 
-#[get("/category/<id>")]
 pub fn get_todo_by_category(
     id: String,
 ) -> Result<Json<Vec<ResponseTodoByCategory>>, Custom<Json<ResponseError>>> {
