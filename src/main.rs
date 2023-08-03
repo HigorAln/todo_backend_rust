@@ -8,7 +8,9 @@ mod repository;
 mod routes;
 mod shared;
 
-use routes::{system::system_routes, todo::todo_routers, user::user_routers};
+use routes::{
+    category::category_routers, system::system_routes, todo::todo_routers, user::user_routers,
+};
 
 #[launch]
 fn rocket() -> _ {
@@ -16,4 +18,5 @@ fn rocket() -> _ {
         .mount("/", system_routes())
         .mount("/user", user_routers())
         .mount("/todo", todo_routers())
+        .mount("/category", category_routers())
 }

@@ -13,7 +13,7 @@ impl TodoRepo {
 
         match result {
             Ok(value) => Ok(value),
-            Err(e) => Err(ResponseError {
+            Err(_) => Err(ResponseError {
                 message: "Error deleting todo",
                 status: Some(Status::NotFound),
             }),

@@ -5,11 +5,9 @@ use rocket::serde::{Deserialize, Serialize};
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Category {
     #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
-    id: Option<ObjectId>,
+    pub id: Option<ObjectId>,
 
     pub name: String,
-    pub created_at: Option<String>,
-    pub updated_at: Option<String>,
     pub owner: ObjectId,
 
     #[serde(skip_serializing_if = "Option::is_none")]

@@ -1,7 +1,7 @@
 use rocket::{response::status::Custom, serde::json::Json};
 use todo_backend::ResponseError;
 
-use crate::{models::todo_model::Todo, repository::todo::todo_repo::TodoRepo};
+use crate::repository::todo::todo_repo::TodoRepo;
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct ResponseTodoByCategory {
@@ -21,9 +21,7 @@ pub fn get_todo_by_category(
 
     match todos {
         Ok(v) => {
-            let todos: Vec<Todo> = v.map(|todo| todo.unwrap()).collect();
-
-            let mapped_result = todos
+            let mapped_result = v
                 .iter()
                 .map(|todo| ResponseTodoByCategory {
                     title: todo.title.clone(),

@@ -5,14 +5,18 @@ use rocket::{
 };
 use todo_backend::ResponseError;
 
-use crate::modules::todo::{
-    create_todo::CreateTodoRepo, get_todo_by_category::ResponseTodoByCategory,
-    get_todo_by_id::GetTodoByIdResponse,
+use crate::{
+    middleware::user::UserOnly,
+    modules::todo::{
+        create_todo::CreateTodoRepo, get_todo_by_category::ResponseTodoByCategory,
+        get_todo_by_id::GetTodoByIdResponse,
+    },
 };
 
 #[post("/", data = "<todo>")]
 pub fn create_todo_router(
     todo: Json<CreateTodoRepo>,
+    _user: UserOnly,
 ) -> Result<Json<InsertOneResult>, Custom<Json<ResponseError>>> {
     crate::modules::todo::create_todo::create_todo(todo)
 }
