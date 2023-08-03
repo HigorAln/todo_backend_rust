@@ -39,11 +39,17 @@ pub fn update_todo_router(
     crate::modules::todo::update_todo::update_todo(id, data)
 }
 
+#[delete("/<id>")]
+pub fn delete_todo_router(id: String) -> Result<Json<Value>, Custom<Json<ResponseError>>> {
+    crate::modules::todo::delete_todo::delete_todo(id)
+}
+
 pub fn todo_routers() -> Vec<rocket::Route> {
     routes![
         create_todo_router,
         get_todo_by_category_router,
         get_todo_by_id_router,
-        update_todo_router
+        update_todo_router,
+        delete_todo_router
     ]
 }
