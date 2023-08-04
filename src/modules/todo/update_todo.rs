@@ -16,6 +16,7 @@ pub struct UpdateTodoRequest {
     pub description: Option<String>,
     pub category: Option<String>,
     pub priority: Option<u8>,
+    pub done: Option<bool>,
 }
 
 pub fn update_todo(

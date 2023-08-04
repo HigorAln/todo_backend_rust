@@ -4,18 +4,13 @@ use rocket::{
 };
 use todo_backend::ResponseError;
 
-use crate::{
-    middleware::user::UserOnly, repository::category::category_repo::CategoryRepo,
-    routes::category::verify_if_user_is_owner,
-};
+use crate::{middleware::user::UserOnly, repository::category::category_repo::CategoryRepo};
 
 pub fn delete_category(
     id: String,
     user: UserOnly,
 ) -> Result<Json<Value>, Custom<Json<ResponseError>>> {
-    let _ = verify_if_user_is_owner(user, &id);
-
-    let result = CategoryRepo::init().delete_category(&id);
+    let result = CategoryRepo::init().delete_category(&id, &user.id);
 
     match result {
         Ok(_) => Ok(Json(json!({ "message": "Category deleted successfully" }))),

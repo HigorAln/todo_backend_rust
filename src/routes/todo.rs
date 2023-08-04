@@ -1,4 +1,3 @@
-use mongodb::results::InsertOneResult;
 use rocket::{
     response::status::Custom,
     serde::json::{Json, Value},
@@ -17,15 +16,16 @@ use crate::{
 pub fn create_todo_router(
     todo: Json<CreateTodoRepo>,
     _user: UserOnly,
-) -> Result<Json<InsertOneResult>, Custom<Json<ResponseError>>> {
+) -> Result<Custom<Json<Value>>, Custom<Json<ResponseError>>> {
     crate::modules::todo::create_todo::create_todo(todo)
 }
 
 #[get("/category/<id>")]
 pub fn get_todo_by_category_router(
     id: String,
+    user: UserOnly,
 ) -> Result<Json<Vec<ResponseTodoByCategory>>, Custom<Json<ResponseError>>> {
-    crate::modules::todo::get_todo_by_category::get_todo_by_category(id)
+    crate::modules::todo::get_todo_by_category::get_todo_by_category(id, user)
 }
 
 #[get("/<id>")]

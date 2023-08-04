@@ -1,5 +1,9 @@
 use mongodb::results::InsertOneResult;
-use rocket::{http::Status, response::status::Custom, serde::json::Json};
+use rocket::{
+    http::Status,
+    response::status::Custom,
+    serde::json::{Json, Value},
+};
 use todo_backend::ResponseError;
 
 use crate::{
@@ -26,13 +30,12 @@ pub fn get_my_profile_router(user: UserOnly) -> Result<Json<User>, Custom<Json<R
     crate::modules::user::my_profile::get_my_profile(user)
 }
 
-#[put("/<id>", data = "<new_user>")]
+#[put("/", data = "<new_user>")]
 pub fn update_user_router(
-    id: String,
     new_user: Json<UpdateUserParams>,
     user_id: UserOnly,
-) -> Result<Json<User>, Custom<Json<ResponseError>>> {
-    crate::modules::user::update_user::update_user(id, new_user, user_id)
+) -> Result<Json<Value>, Custom<Json<ResponseError>>> {
+    crate::modules::user::update_user::update_user(new_user, &user_id.id)
 }
 
 #[post("/", data = "<new_user>")]

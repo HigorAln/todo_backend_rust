@@ -5,10 +5,7 @@ use rocket::{
 };
 use todo_backend::ResponseError;
 
-use crate::{
-    middleware::user::UserOnly, repository::category::category_repo::CategoryRepo,
-    routes::category::verify_if_user_is_owner,
-};
+use crate::{middleware::user::UserOnly, repository::category::category_repo::CategoryRepo};
 use rocket::serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -21,18 +18,13 @@ pub fn update_category(
     id: String,
     data: Json<UpdateCategoryRequest>,
 ) -> Result<Json<Value>, Custom<Json<ResponseError>>> {
-    let _ = verify_if_user_is_owner(user, &id);
-
-    let result = CategoryRepo::init().update_category(&id, &data.name);
+    let result = CategoryRepo::init().update_category(&id, &data.name, &user.id);
 
     match result {
         Ok(_) => Ok(Json(json!({ "message": "Category updated successfully" }))),
-        Err(_) => Err(Custom(
-            Status::InternalServerError,
-            Json(ResponseError {
-                status: Some(Status::InternalServerError),
-                message: "Failed to update category",
-            }),
+        Err(err) => Err(Custom(
+            err.status.unwrap_or(Status::InternalServerError),
+            Json(err),
         )),
     }
 }

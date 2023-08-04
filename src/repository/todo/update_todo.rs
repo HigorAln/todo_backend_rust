@@ -35,6 +35,10 @@ impl TodoRepo {
             update_fields.insert("priority", priority as i32);
         }
 
+        if let Some(done) = data.done {
+            update_fields.insert("done", done);
+        }
+
         let new_doc = doc! {
             "$set": update_fields
         };

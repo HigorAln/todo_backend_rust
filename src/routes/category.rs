@@ -1,4 +1,3 @@
-use mongodb::results::InsertOneResult;
 use rocket::{
     http::Status,
     response::status::Custom,
@@ -25,7 +24,7 @@ pub fn get_category_router(
 pub fn create_category_router(
     category: Json<CreateCategoryRequest>,
     user: UserOnly,
-) -> Result<Json<InsertOneResult>, Custom<Json<ResponseError>>> {
+) -> Result<Custom<Json<Value>>, Custom<Json<ResponseError>>> {
     crate::modules::category::create_category::create_category(user.id, category)
 }
 

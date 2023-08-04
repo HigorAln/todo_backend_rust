@@ -1,5 +1,9 @@
-use mongodb::{bson::oid::ObjectId, results::InsertOneResult};
-use rocket::{response::status::Custom, serde::json::Json};
+use mongodb::bson::oid::ObjectId;
+use rocket::{
+    http::Status,
+    response::status::Custom,
+    serde::json::{json, Json, Value},
+};
 use todo_backend::ResponseError;
 
 use crate::{models::todo_model::Todo, repository::todo::todo_repo::TodoRepo};
@@ -15,7 +19,7 @@ pub struct CreateTodoRepo {
 
 pub fn create_todo(
     data: Json<CreateTodoRepo>,
-) -> Result<Json<InsertOneResult>, Custom<Json<ResponseError>>> {
+) -> Result<Custom<Json<Value>>, Custom<Json<ResponseError>>> {
     let todo: Todo = Todo {
         category: ObjectId::parse_str(&data.category).unwrap(),
         description: data.description.to_owned(),
@@ -30,7 +34,13 @@ pub fn create_todo(
     let todo = collection.create_todo(todo);
 
     match todo {
-        Ok(todo) => Ok(Json(todo)),
+        Ok(todo) => {
+            let id = todo.inserted_id.as_object_id().unwrap().to_hex();
+            Ok(Custom(
+                Status::Created,
+                Json(json!({ "success": "Todo created successfully", "id": id })),
+            ))
+        }
         Err(err) => Err(Custom(err.status.unwrap(), Json(err))),
     }
 }

@@ -1,7 +1,10 @@
 use rocket::{response::status::Custom, serde::json::Json};
 use todo_backend::ResponseError;
 
-use crate::repository::todo::todo_repo::TodoRepo;
+use crate::{
+    middleware::user::UserOnly, repository::todo::todo_repo::TodoRepo,
+    routes::category::verify_if_user_is_owner,
+};
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct ResponseTodoByCategory {
@@ -14,7 +17,9 @@ pub struct ResponseTodoByCategory {
 
 pub fn get_todo_by_category(
     id: String,
+    user: UserOnly,
 ) -> Result<Json<Vec<ResponseTodoByCategory>>, Custom<Json<ResponseError>>> {
+    let _ = verify_if_user_is_owner(user, &id);
     let todo_repo = TodoRepo::init();
 
     let todos = todo_repo.get_todo_by_owner(id);
