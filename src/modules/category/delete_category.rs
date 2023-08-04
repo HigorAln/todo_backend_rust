@@ -1,6 +1,6 @@
 use rocket::{
     response::status::Custom,
-    serde::json::{Json, Value},
+    serde::json::{json, Json, Value},
 };
 use todo_backend::ResponseError;
 
@@ -9,17 +9,16 @@ use crate::{
     routes::category::verify_if_user_is_owner,
 };
 
-pub fn get_category(
-    user: UserOnly,
+pub fn delete_category(
     id: String,
+    user: UserOnly,
 ) -> Result<Json<Value>, Custom<Json<ResponseError>>> {
     let _ = verify_if_user_is_owner(user, &id);
-    let collection = CategoryRepo::init();
 
-    let result = collection.get_category(id);
+    let result = CategoryRepo::init().delete_category(&id);
 
     match result {
-        Ok(category) => Ok(category),
+        Ok(_) => Ok(Json(json!({ "message": "Category deleted successfully" }))),
         Err(err) => Err(Custom(err.status.unwrap(), Json(err))),
     }
 }
