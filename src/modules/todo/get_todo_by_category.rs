@@ -12,7 +12,7 @@ pub struct ResponseTodoByCategory {
     description: Option<String>,
     priority: Option<u8>,
     done: bool,
-    _id: Option<String>,
+    id: Option<String>,
 }
 
 pub fn get_todo_by_category(
@@ -33,7 +33,7 @@ pub fn get_todo_by_category(
                     description: todo.description.clone(),
                     priority: todo.priority,
                     done: todo.done,
-                    _id: match todo.id.clone() {
+                    id: match todo.id.clone() {
                         Some(v) => Some(v.to_hex()),
                         None => None,
                     },

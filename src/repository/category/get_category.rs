@@ -12,7 +12,7 @@ use super::category_repo::CategoryRepo;
 
 #[derive(Serialize, Deserialize)]
 pub struct TodoResponse {
-    _id: String,
+    id: String,
     pub title: String,
     pub description: Option<String>,
     pub done: bool,
@@ -43,7 +43,7 @@ impl CategoryRepo {
                 let todo_response: Vec<TodoResponse> = todos_result
                     .iter()
                     .map(|todo| TodoResponse {
-                        _id: todo.id.map(|id| id.to_hex()).unwrap(),
+                        id: todo.id.map(|id| id.to_hex()).unwrap(),
                         title: todo.title.to_owned(),
                         description: todo.description.to_owned(),
                         done: todo.done,

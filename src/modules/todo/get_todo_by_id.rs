@@ -6,7 +6,7 @@ use rocket::serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
 pub struct GetTodoByIdResponse {
-    _id: String,
+    id: String,
     title: String,
     description: Option<String>,
     priority: Option<u8>,
@@ -23,7 +23,7 @@ pub fn get_todo_by_id(
 
     match todo {
         Ok(v) => Ok(Json(GetTodoByIdResponse {
-            _id: v.id.unwrap().to_hex(),
+            id: v.id.unwrap().to_hex(),
             title: v.title,
             description: v.description,
             priority: v.priority,

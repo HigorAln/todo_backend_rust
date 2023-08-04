@@ -1,7 +1,10 @@
-use rocket::{response::status::Custom, serde::json::Json};
+use rocket::{
+    response::status::Custom,
+    serde::json::{Json, Value},
+};
 use todo_backend::ResponseError;
 
-use crate::{modules::system::login::Login, repository::user::login::LoginResponse};
+use crate::modules::system::login::Login;
 
 #[get("/")]
 pub fn health_check_router() -> Result<Json<String>, Custom<Json<ResponseError>>> {
@@ -9,7 +12,7 @@ pub fn health_check_router() -> Result<Json<String>, Custom<Json<ResponseError>>
 }
 
 #[post("/login", data = "<login>")]
-pub fn login(login: Json<Login>) -> Result<Json<LoginResponse>, Custom<Json<ResponseError>>> {
+pub fn login(login: Json<Login>) -> Result<Custom<Json<Value>>, Custom<Json<Value>>> {
     crate::modules::system::login::login(login)
 }
 
